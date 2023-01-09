@@ -18,7 +18,7 @@ public:
 
 public:
      void dbConnect(int n, QComboBox *QComboBox, QString driverName, QString hostName, int port, QString dbName, QString pwd, QString userName, QString connectOptions);
-     void abiConnect(QString driverName, QString hostName, int port, QString dbName, QString pwd, QString userName, QString connectOptions);
+     void abiConnect(QString driverName, QString hostName, int port, QString dbName, QString pwd, QString userName, QString connectOptions, std::vector <QDomElement> list);
      void checkResourses(QComboBox *combobx, QAbstractItemDelegate *deleg,  QTableView *table, QString usr, QString driverName, QString hostName, int port, QString dbName, QString pwd, QString userName, QString connectOptions);
      void settingTriggers(QComboBox *cmb, QTableView *tbl, const int &state);
      void loggingDBAccess(int action, QComboBox *cmb, QTableView *tbl);
