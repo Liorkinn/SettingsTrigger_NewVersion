@@ -23,7 +23,8 @@ MainWindow::MainWindow(QWidget *parent)
                                 dbworker[0].attribute("name"),
                                 "lostdox1",
                                 "postgres",
-                                dbworker[0].attribute("options"));
+                                dbworker[0].attribute("options"),
+                                dbworker);
     }else
     {
         QMessageBox::critical(0, "Ошибка открытия файла", "Файл не открыт! Проверьте права доступа database.xml, убедитесь\nчто файл расположен по пути /mnt/settings/,\nа также проверьте правильность содержимого xml файла. Закрытие приложения!");
@@ -71,7 +72,7 @@ void MainWindow::createUI()
     comboBox =  new QComboBox;
     table1   =  new QTableView;
     button   =  new QPushButton("Посмотреть настройки таблиц");
-    buttoncls   =  new QPushButton("Закрыть");
+    buttoncls = new QPushButton("Закрыть");
     delegate =  new checkboxDelegate;
     labeldb  =  new QLabel ("База данных:");
     //..End create forms...
