@@ -21,22 +21,30 @@ void dbWorker::dbConnect(int n, QComboBox *QComboBox, QString driverName, QStrin
     }
 }
 
-void dbWorker::abiConnect(QString driverName, QString hostName, int port, QString dbName, QString pwd, QString userName, QString connectOptions)
+void dbWorker::abiConnect(QString driverName, QString hostName, int port, QString dbName, QString pwd, QString userName, QString connectOptions, std::vector <QDomElement> list)
 {
-    abiDB = QSqlDatabase::addDatabase                  (driverName,"abi");  ///< Подключаемся к БД abi_db для логирования действий пользователей.
-    abiDB.setHostName                                  (hostName);
-    abiDB.setPort                                      (port);
-    abiDB.setDatabaseName                              (dbName);
-    abiDB.setPassword                                  (pwd);
-    abiDB.setUserName                                  (userName);
-    abiDB.setConnectOptions                            (connectOptions);
-    if(abiDB.open())
-    {
-       qDebug() << "[Success] Подключение к abi_db произошло успешно. Данные будут логироваться в events_controllaccess!";
-    }else
-    {
-       qDebug() << "[Error] Ошибка подключения к abi_db. Логирование в таблицу events_controllaccess невозможно!";
-    }
+  for(unsigned int i = 0; i <  list.size(); i++)
+  {
+      if(list[i].attribute("name") == "abi")
+      {
+        abiDB = QSqlDatabase::addDatabase                  (driverName,"abi");  ///< Подключаемся к БД abi_db для логирования действий пользователей.
+        abiDB.setHostName                                  (hostName);
+        abiDB.setPort                                      (port);
+        abiDB.setDatabaseName                              (dbName);
+        abiDB.setPassword                                  (pwd);
+        abiDB.setUserName                                  (userName);
+        abiDB.setConnectOptions                            (connectOptions);
+      if(abiDB.open())
+      {
+       qDebug() << "[Success] Подключение к abi произошло успешно. Данные будут логироваться в events_controllaccess!";
+      }else
+      {
+       qDebug() << "[Error] Ошибка подключения к abi. Логирование в таблицу events_controllaccess невозможно!";
+      }
+        break;
+      }
+  }
+
 }
 
 void dbWorker::checkResourses(QComboBox *combobx, QAbstractItemDelegate *deleg, QTableView *table,QString usr,  QString driverName, QString hostName, int port, QString dbName, QString pwd, QString userName, QString connectOptions)
@@ -167,8 +175,6 @@ void dbWorker::settingTriggers(QComboBox *cmb, QTableView *tbl, const int& state
         else{
             QMessageBox::critical(0,"Ошибка", "Выключение события удаления в " + schema +"." + '"' + tablename + '"' + " произошло с ошибкой!");
             qDebug() << "[Error] Ошибка выключения триггера delete для таблицы " + schema +"." + '"' + tablename + '"' + ". Запрос: " + strDelete;}
-
-
     }
 }
 
@@ -184,76 +190,76 @@ void dbWorker::loggingDBAccess(int action, QComboBox *cmb, QTableView *tbl)
     query = new QSqlQuery(abiDB);
     switch (action){
     case 1:
-                    query->prepare("INSERT INTO _abi.events_controllaccess (login, name_table, info, data_time, name_base, description) VALUES (:blogin, :btable, :binfo, :bdatetime, :bnamebase, :bdescription);");
-                    query->bindValue(":blogin", user);
-                    query->bindValue(":btable", schema + "."+tablename);
-                    query->bindValue(":binfo", "Событие добавления контролируется");
-                    query->bindValue(":bdatetime", timestamp);
-                    query->bindValue(":bnamebase", basename);
-                    query->bindValue(":bdescription", description);
-                    if(!query->exec()){
-                        qDebug() << "[Success] Ошибка логирования в таблицу events_controlaccess!";
-                    }
+        query->prepare("INSERT INTO _abi.events_controllaccess (login, name_table, info, data_time, name_base, description) VALUES (:blogin, :btable, :binfo, :bdatetime, :bnamebase, :bdescription);");
+        query->bindValue(":blogin", user);
+        query->bindValue(":btable", schema + "."+tablename);
+        query->bindValue(":binfo", "Событие добавления контролируется");
+        query->bindValue(":bdatetime", timestamp);
+        query->bindValue(":bnamebase", basename);
+        query->bindValue(":bdescription", description);
+        if(!query->exec()){
+            qDebug() << "[Success] Ошибка логирования в таблицу events_controlaccess!";
+        }
         break;
     case 2:
-                    query->prepare("INSERT INTO _abi.events_controllaccess (login, name_table, info, data_time, name_base, description) VALUES (:blogin, :btable, :binfo, :bdatetime, :bnamebase, :bdescription);");
-                    query->bindValue(":blogin", user);
-                    query->bindValue(":btable", schema + "."+tablename);
-                    query->bindValue(":binfo", "Событие добавления не контролируется");
-                    query->bindValue(":bdatetime", timestamp);
-                    query->bindValue(":bnamebase", basename);
-                    query->bindValue(":bdescription", description);
-                    if(!query->exec()){
-                        qDebug() << "[Success] Ошибка логирования в таблицу events_controlaccess!";
-                    }
+        query->prepare("INSERT INTO _abi.events_controllaccess (login, name_table, info, data_time, name_base, description) VALUES (:blogin, :btable, :binfo, :bdatetime, :bnamebase, :bdescription);");
+        query->bindValue(":blogin", user);
+        query->bindValue(":btable", schema + "."+tablename);
+        query->bindValue(":binfo", "Событие добавления не контролируется");
+        query->bindValue(":bdatetime", timestamp);
+        query->bindValue(":bnamebase", basename);
+        query->bindValue(":bdescription", description);
+        if(!query->exec()){
+            qDebug() << "[Success] Ошибка логирования в таблицу events_controlaccess!";
+        }
         break;
     case 3:
-                   query->prepare("INSERT INTO _abi.events_controllaccess (login, name_table, info, data_time, name_base, description) VALUES (:blogin, :btable, :binfo, :bdatetime, :bnamebase, :bdescription);");
-                   query->bindValue(":blogin", user);
-                   query->bindValue(":btable", schema + "."+tablename);
-                   query->bindValue(":binfo", "Событие обновления контролируется");
-                   query->bindValue(":bdatetime", timestamp);
-                   query->bindValue(":bnamebase", basename);
-                   query->bindValue(":bdescription", description);
-                   if(!query->exec()){
-                       qDebug() << "[Success] Ошибка логирования в таблицу events_controlaccess!";
-                   }
+       query->prepare("INSERT INTO _abi.events_controllaccess (login, name_table, info, data_time, name_base, description) VALUES (:blogin, :btable, :binfo, :bdatetime, :bnamebase, :bdescription);");
+       query->bindValue(":blogin", user);
+       query->bindValue(":btable", schema + "."+tablename);
+       query->bindValue(":binfo", "Событие обновления контролируется");
+       query->bindValue(":bdatetime", timestamp);
+       query->bindValue(":bnamebase", basename);
+       query->bindValue(":bdescription", description);
+       if(!query->exec()){
+           qDebug() << "[Success] Ошибка логирования в таблицу events_controlaccess!";
+       }
         break;
     case 4:
-                    query->prepare("INSERT INTO _abi.events_controllaccess (login, name_table, info, data_time, name_base, description) VALUES (:blogin, :btable, :binfo, :bdatetime, :bnamebase, :bdescription);");
-                    query->bindValue(":blogin", user);
-                    query->bindValue(":btable", schema + "."+tablename);
-                    query->bindValue(":binfo", "Событие обновления не контролируется");
-                    query->bindValue(":bdatetime", timestamp);
-                    query->bindValue(":bnamebase", basename);
-                    query->bindValue(":bdescription", description);
-                    if(!query->exec()){
-                        qDebug() << "[Success] Ошибка логирования в таблицу events_controlaccess!";
-                    }
+        query->prepare("INSERT INTO _abi.events_controllaccess (login, name_table, info, data_time, name_base, description) VALUES (:blogin, :btable, :binfo, :bdatetime, :bnamebase, :bdescription);");
+        query->bindValue(":blogin", user);
+        query->bindValue(":btable", schema + "."+tablename);
+        query->bindValue(":binfo", "Событие обновления не контролируется");
+        query->bindValue(":bdatetime", timestamp);
+        query->bindValue(":bnamebase", basename);
+        query->bindValue(":bdescription", description);
+        if(!query->exec()){
+            qDebug() << "[Success] Ошибка логирования в таблицу events_controlaccess!";
+        }
         break;
     case 5:
-                    query->prepare("INSERT INTO _abi.events_controllaccess (login, name_table, info, data_time, name_base, description) VALUES (:blogin, :btable, :binfo, :bdatetime, :bnamebase, :bdescription);");
-                    query->bindValue(":blogin", user);
-                    query->bindValue(":btable", schema + "."+tablename);
-                    query->bindValue(":binfo", "Событие удаления контролируется");
-                    query->bindValue(":bdatetime", timestamp);
-                    query->bindValue(":bnamebase", basename);
-                    query->bindValue(":bdescription", description);
-                    if(!query->exec()){
-                        qDebug() << "[Success] Ошибка логирования в таблицу events_controlaccess!";
-                    }
+        query->prepare("INSERT INTO _abi.events_controllaccess (login, name_table, info, data_time, name_base, description) VALUES (:blogin, :btable, :binfo, :bdatetime, :bnamebase, :bdescription);");
+        query->bindValue(":blogin", user);
+        query->bindValue(":btable", schema + "."+tablename);
+        query->bindValue(":binfo", "Событие удаления контролируется");
+        query->bindValue(":bdatetime", timestamp);
+        query->bindValue(":bnamebase", basename);
+        query->bindValue(":bdescription", description);
+        if(!query->exec()){
+            qDebug() << "[Success] Ошибка логирования в таблицу events_controlaccess!";
+        }
         break;
     case 6:
-                query->prepare("INSERT INTO _abi.events_controllaccess (login, name_table, info, data_time, name_base, description) VALUES (:blogin, :btable, :binfo, :bdatetime, :bnamebase, :bdescription);");
-                query->bindValue(":blogin", user);
-                query->bindValue(":btable", schema + "."+tablename);
-                query->bindValue(":binfo", "Событие удаления не контролируется");
-                query->bindValue(":bdatetime", timestamp);
-                query->bindValue(":bnamebase", basename);
-                query->bindValue(":bdescription", description);
-                if(!query->exec()){
-                    qDebug() << "[Success] Ошибка логирования в таблицу events_controlaccess!";
-                }
+        query->prepare("INSERT INTO _abi.events_controllaccess (login, name_table, info, data_time, name_base, description) VALUES (:blogin, :btable, :binfo, :bdatetime, :bnamebase, :bdescription);");
+        query->bindValue(":blogin", user);
+        query->bindValue(":btable", schema + "."+tablename);
+        query->bindValue(":binfo", "Событие удаления не контролируется");
+        query->bindValue(":bdatetime", timestamp);
+        query->bindValue(":bnamebase", basename);
+        query->bindValue(":bdescription", description);
+        if(!query->exec()){
+            qDebug() << "[Success] Ошибка логирования в таблицу events_controlaccess!";
+        }
         break;
     default:
         break;
